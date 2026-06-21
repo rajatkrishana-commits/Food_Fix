@@ -15,9 +15,10 @@ app.use(express.urlencoded({ limit: '15mb', extended: true }));
 
 // Initialize the modern Gemini SDK
 // AI Studio automatically injects process.env.GEMINI_API_KEY at runtime from user secrets.
-const apiKey = process.env.GEMINI_API_KEY;
+// Supports GOOGLE_API_KEY as an alternative / fallback for deployment environments like GitHub or Vercel.
+const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
 const ai = new GoogleGenAI({
-  apiKey: apiKey,
+  apiKey: apiKey || '',
   httpOptions: {
     headers: {
       'User-Agent': 'aistudio-build',
@@ -91,7 +92,7 @@ app.post('/api/chat', async (req, res) => {
 
     if (!apiKey) {
       return res.status(500).json({
-        error: 'Missing GEMINI_API_KEY on the server. Please configure it in your Settings > Secrets.',
+        error: 'Missing GEMINI_API_KEY or GOOGLE_API_KEY on the server. Please configure an API key in your environment variables.',
       });
     }
 
